@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Admin Panel</h1>
+  <p class="page-subtitle">
+    <a href="{{ url_for('admin_logout') }}" class="text-muted" style="font-size:.85rem;">Log out</a>
+  </p>
+</div>
+
+<!-- Results reveal status -->
+<div class="status-banner {% if revealed %}revealed{% else %}unrevealed{% endif %}">
+  {% if revealed %}
+    ✅ Results are currently <strong>visible</strong> to all guests.
+  {% else %}
+    🔒 Results are currently <strong>hidden</strong> from guests.
+  {% endif %}
+</div>
+
+<!-- Reveal / hide controls -->
+<div class="admin-section">
+  <div class="admin-section-title">Results Visibility</div>
+  {% if not revealed %}
+  <p class="text-muted mb-2" style="font-size:.88rem;">
+    When you're ready, reveal the winners to all guests at once.
+  </p>
+  <button class="btn btn-gold" data-confirm-trigger="confirm-reveal">
+    🏆 Reveal Results
+  </button>
+  {% else %}
+  <p class="text-muted mb-2" style="font-size:.88rem;">
+    Results are currently visible. You can hide them again if needed.
+  </p>
+  <form method="POST" action="{{ url_for('admin_hide') }}" style="display:inline;">
+    <button class="btn btn-muted btn-sm" type="submit">🔒 Hide Results</button>
+  </form>
+  {% endif %}
+</div>
+
+<!-- Stats -->
+<div class="admin-section">
+  <div class="admin-section-title">Festival Stats</div>
+  <div class="flex gap-2" style="flex-wrap:wrap; margin-bottom:1rem;">
+    <span class="stat-pill"><strong>{{ beer_count }}</strong> beers registered</span>
+    <span class="stat-pill"><strong>{{ vote_count }}</strong> total votes</span>
+  </div>
+  <div>
+    {% for cat_id, cat_name, cat_emoji, count in tallies %}
+    <div class="tally-row">
+      <span class="tally-emoji">{{ cat_emoji }}</span>
+      <span class="tally-name">{{ cat_name }}</span>
+      <span class="tally-count">{{ count }} vote{{ 's' if count != 1 }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Beer management -->
+<div class="admin-section">
+  <div class="admin-section-title">Registered Beers</div>
+  {% if all_beers %}
+  {% for beer in all_beers %}
+  <div class="admin-beer-row">
+    {% if beer.image_path %}
+      <img class="admin-beer-thumb"
+           src="{{ url_for('static', filename=beer.image_path) }}"
+           alt="{{ beer.name }}">
+    {% else %}
+      <div class="admin-beer-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;border-radius:8px;">🍺</div>
+    {% endif %}
+    <div class="admin-beer-info">
+      <div class="admin-beer-name">{{ beer.name }}</div>
+      <div class="admin-beer-guest">{{ beer.guest_name }}</div>
+    </div>
+    <form method="POST"
+          action="{{ url_for('admin_delete_beer', beer_id=beer.id) }}"
+          onsubmit="return confirm('Delete « {{ beer.name }} » and all its votes?')">
+      <button class="btn btn-danger btn-sm" type="submit">🗑</button>
+    </form>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="text-muted" style="font-size:.88rem;">No beers registered yet.</p>
+  {% endif %}
+</div>
+
+<!-- Danger zone -->
+<div class="admin-section" style="border-color: #7a2020;">
+  <div class="admin-section-title" style="color:#e05050;">Danger Zone</div>
+  <p class="text-muted mb-2" style="font-size:.88rem;">
+    Reset wipes all beers, votes, and uploaded photos. This cannot be undone.
+  </p>
+  <button class="btn btn-danger btn-sm" data-confirm-trigger="confirm-reset">
+    ⚠️ Reset All Data
+  </button>
+</div>
+
+<!-- Confirm reveal dialog -->
+<div class="overlay" id="confirm-reveal">
+  <div class="dialog">
+    <h3>Reveal Results?</h3>
+    <p>This will make the winner of every category visible to all guests. You can hide them again afterwards.</p>
+    <div class="dialog-actions">
+      <form method="POST" action="{{ url_for('admin_reveal') }}" style="flex:1;">
+        <button class="btn btn-gold btn-block" type="submit">🏆 Yes, Reveal!</button>
+      </form>
+      <button class="btn btn-muted" data-confirm-cancel="confirm-reveal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm reset dialog -->
+<div class="overlay" id="confirm-reset">
+  <div class="dialog">
+    <h3>Reset All Data?</h3>
+    <p>This permanently deletes every beer, vote, and image. There is no undo.</p>
+    <div class="dialog-actions">
+      <form method="POST" action="{{ url_for('admin_reset') }}" style="flex:1;">
+        <button class="btn btn-danger btn-block" type="submit">⚠️ Yes, Reset</button>
+      </form>
+      <button class="btn btn-muted" data-confirm-cancel="confirm-reset">Cancel</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

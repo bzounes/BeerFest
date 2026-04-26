@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero-emoji">🍺</div>
+  <h1 class="hero-title">Welcome to<br><span>BeerFest!</span></h1>
+  <p class="hero-subtitle">Register your beers and vote for the best of the fest.</p>
+
+  <div class="stats-row">
+    <span class="stat-pill"><strong>{{ beer_count }}</strong> beer{{ 's' if beer_count != 1 }} entered</span>
+    <span class="stat-pill"><strong>{{ vote_count }}</strong> vote{{ 's' if vote_count != 1 }} cast</span>
+  </div>
+
+  <div class="home-actions">
+    <a href="{{ url_for('register') }}" class="action-card">
+      <span class="ac-emoji">➕</span>
+      <span class="ac-title">Add Your Beer</span>
+      <span class="ac-desc">Register a new entry</span>
+    </a>
+    <a href="{{ url_for('beers') }}" class="action-card">
+      <span class="ac-emoji">🍻</span>
+      <span class="ac-title">Browse Beers</span>
+      <span class="ac-desc">See what's in the lineup</span>
+    </a>
+    <a href="{{ url_for('vote_home') }}" class="action-card">
+      <span class="ac-emoji">🗳️</span>
+      <span class="ac-title">Vote</span>
+      <span class="ac-desc">Pick your favourites</span>
+    </a>
+    <a href="{{ url_for('results') }}" class="action-card">
+      <span class="ac-emoji">🏆</span>
+      <span class="ac-title">Results</span>
+      <span class="ac-desc">See the winners</span>
+    </a>
+  </div>
+</div>
+
+<div class="mt-3">
+  <p class="text-muted text-center" style="font-size:.8rem;">
+    Running the event? <a href="{{ url_for('admin_login') }}">Admin panel</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">🏆 Results</h1>
+  <p class="page-subtitle">The votes are in — here are the winners!</p>
+</div>
+
+{% for cat_id, cat_name, cat_emoji in categories %}
+{% set cat_result = results[cat_id] %}
+<div class="results-section">
+  <div class="results-section-header">
+    <span class="r-emoji">{{ cat_result.emoji }}</span>
+    <span class="r-name">{{ cat_result.name }}</span>
+  </div>
+
+  {% if cat_result.winners %}
+  <div class="podium">
+    {% for entry in cat_result.winners %}
+    <div class="podium-entry rank-{{ loop.index }}">
+      <span class="podium-rank">
+        {% if loop.index == 1 %}🥇
+        {% elif loop.index == 2 %}🥈
+        {% elif loop.index == 3 %}🥉
+        {% endif %}
+      </span>
+
+      {% if entry.image_path %}
+        <img class="podium-img"
+             src="{{ url_for('static', filename=entry.image_path) }}"
+             alt="{{ entry.name }}">
+      {% else %}
+        <div class="podium-placeholder">🍺</div>
+      {% endif %}
+
+      <div class="podium-info">
+        <div class="podium-beer-name">{{ entry.name }}</div>
+        <div class="podium-guest-name">by {{ entry.guest_name }}</div>
+      </div>
+      <div class="podium-votes">{{ entry.vote_count }} vote{{ 's' if entry.vote_count != 1 }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="no-votes">No votes were cast in this category.</p>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

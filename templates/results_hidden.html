@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<div class="hidden-results-wrap">
+  <div class="big-emoji">🔒</div>
+  <h2>Results Not Yet Revealed</h2>
+  <p>The host will announce the winners when voting closes.</p>
+  <p class="mt-2"><a href="{{ url_for('vote_home') }}" class="btn btn-outline mt-2">🗳️ Go Vote</a></p>
+</div>
+{% endblock %}

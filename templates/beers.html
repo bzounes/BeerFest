@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}All Beers{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">All Beers</h1>
+  <p class="page-subtitle">{{ beers | length }} entr{{ 'y' if beers | length == 1 else 'ies' }} in the festival</p>
+</div>
+
+{% if beers %}
+<div class="beer-grid">
+  {% for beer in beers %}
+  <div class="beer-card">
+    {% if beer.image_path %}
+      <img class="beer-card-img" src="{{ url_for('static', filename=beer.image_path) }}" alt="{{ beer.name }}">
+    {% else %}
+      <div class="beer-card-placeholder">🍺</div>
+    {% endif %}
+    <div class="beer-card-info">
+      <div class="beer-card-name">{{ beer.name }}</div>
+      <div class="beer-card-guest">by {{ beer.guest_name }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-emoji">🍺</div>
+  <p>No beers yet — be the first to <a href="{{ url_for('register') }}">add one!</a></p>
+</div>
+{% endif %}
+
+<div class="mt-3">
+  <a href="{{ url_for('register') }}" class="btn btn-primary">➕ Add a Beer</a>
+</div>
+{% endblock %}

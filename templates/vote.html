@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Vote – {{ category[1] }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">{{ category[2] }} {{ category[1] }}</h1>
+  <p class="page-subtitle">Choose up to {{ votes_per_category }} beers. Tap again to remove a vote.</p>
+</div>
+
+<!-- Vote counter -->
+<div class="vote-counter">
+  <span class="vote-counter-label">Your votes:</span>
+  <div class="vote-counter-pips">
+    {% for i in range(votes_per_category) %}
+    <div class="pip {% if i < votes_used %}filled{% endif %}"></div>
+    {% endfor %}
+  </div>
+  <span class="vote-counter-text" id="votes-counter-text">
+    {% set remaining = votes_per_category - votes_used %}
+    {% if remaining == 0 %}No votes left
+    {% elif remaining == 1 %}1 vote left
+    {% else %}{{ remaining }} votes left{% endif %}
+  </span>
+</div>
+
+{% if beers %}
+<div class="vote-beer-grid" id="vote-grid"
+     data-category="{{ category[0] }}"
+     data-votes-per-category="{{ votes_per_category }}">
+  {% set remaining = votes_per_category - votes_used %}
+  {% for beer in beers %}
+  {% set is_voted = beer.id in voted_ids %}
+  <div class="vote-card {% if is_voted %}selected{% elif remaining == 0 %}disabled{% endif %}"
+       data-beer-id="{{ beer.id }}">
+
+    <div class="vote-card-check">✓</div>
+
+    {% if beer.image_path %}
+      <img class="beer-card-img"
+           src="{{ url_for('static', filename=beer.image_path) }}"
+           alt="{{ beer.name }}" draggable="false">
+    {% else %}
+      <div class="beer-card-placeholder">🍺</div>
+    {% endif %}
+
+    <div class="beer-card-info">
+      <div class="beer-card-name">{{ beer.name }}</div>
+      <div class="beer-card-guest">{{ beer.guest_name }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-emoji">🍺</div>
+  <p>No beers have been registered yet. <a href="{{ url_for('register') }}">Add one!</a></p>
+</div>
+{% endif %}
+
+<div class="mt-3 flex gap-1" style="flex-wrap:wrap;">
+  <a href="{{ url_for('vote_home') }}" class="btn btn-muted">← All Categories</a>
+</div>
+{% endblock %}

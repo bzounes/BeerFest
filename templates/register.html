@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Add a Beer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Add Your Beer</h1>
+  <p class="page-subtitle">Enter your beer into the festival. Photo is optional but encouraged!</p>
+</div>
+
+<form method="POST" enctype="multipart/form-data" style="max-width:480px;">
+
+  <div class="form-group">
+    <label class="form-label" for="name">Beer Name</label>
+    <input class="form-control" type="text" id="name" name="name"
+           placeholder="e.g. Hazy Daydream IPA" required maxlength="120">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="guest_name">Your Name</label>
+    <input class="form-control" type="text" id="guest_name" name="guest_name"
+           placeholder="e.g. Alex" required maxlength="80">
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Photo <span class="text-muted">(optional)</span></label>
+    <div class="file-input-wrapper">
+      <label class="file-input-label" id="img-input-label" for="img-input">
+        📷 <span id="img-input-label-text">Choose a photo…</span>
+      </label>
+      <input id="img-input" type="file" name="image"
+             accept="image/png,image/jpeg,image/jpg,image/gif,image/webp">
+    </div>
+    <p class="form-hint">PNG, JPG, GIF or WebP · max 20 MB</p>
+    <div id="img-preview-wrap">
+      <img id="img-preview" src="" alt="Preview">
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-block mt-2" type="submit">
+    🍺 Register Beer
+  </button>
+</form>
+{% endblock %}

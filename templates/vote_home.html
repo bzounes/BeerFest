@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Vote{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Vote</h1>
+  <p class="page-subtitle">{{ votes_per_category }} votes per category. Tap a category to cast your votes.</p>
+</div>
+
+<div class="category-grid">
+  {% for cat_id, cat_name, cat_emoji in categories %}
+  {% set used = vote_counts[cat_id] %}
+  <a href="{{ url_for('vote', category_id=cat_id) }}" class="category-card">
+    <span class="cat-emoji">{{ cat_emoji }}</span>
+    <span class="cat-name">{{ cat_name }}</span>
+    <span class="cat-votes-badge {% if used == votes_per_category %}full{% endif %}">
+      {% if used == votes_per_category %}
+        ✓ Done
+      {% else %}
+        {{ used }}/{{ votes_per_category }} votes
+      {% endif %}
+    </span>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
