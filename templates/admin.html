@@ -72,6 +72,10 @@
     <div class="admin-beer-info">
       <div class="admin-beer-name">{{ beer.name }}</div>
       <div class="admin-beer-guest">{{ beer.guest_name }}</div>
+      {% if beer.category and beer.category in beer_category_map %}
+      {% set cat = beer_category_map[beer.category] %}
+      <div class="cat-badge" style="margin-top:.2rem;">{{ cat[2] }} {{ cat[1] }}</div>
+      {% endif %}
     </div>
     <form method="POST"
           action="{{ url_for('admin_delete_beer', beer_id=beer.id) }}"

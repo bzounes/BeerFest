@@ -22,6 +22,17 @@
   </div>
 
   <div class="form-group">
+    <label class="form-label" for="category">Category</label>
+    <select class="form-control" id="category" name="category" required>
+      <option value="" disabled selected>Select a category…</option>
+      {% for cat_id, cat_name, cat_emoji in beer_categories %}
+      <option value="{{ cat_id }}">{{ cat_emoji }} {{ cat_name }}</option>
+      {% endfor %}
+    </select>
+    <p class="form-hint">Most Unique, Best Label, Best Overall, and Worst Overall are open to all beers.</p>
+  </div>
+
+  <div class="form-group">
     <label class="form-label">Photo <span class="text-muted">(optional)</span></label>
     <div class="file-input-wrapper">
       <label class="file-input-label" id="img-input-label" for="img-input">

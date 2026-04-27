@@ -29,53 +29,59 @@
 
   const categoryId = grid.dataset.category;
   const votesPerCategory = parseInt(grid.dataset.votesPerCategory, 10);
-  const pips = Array.from(document.querySelectorAll('.pip'));
+  const pip = document.querySelector('.pip');
   const counterText = document.getElementById('votes-counter-text');
 
   function updateCounter(used) {
-    pips.forEach((pip, i) => {
-      pip.classList.toggle('filled', i < used);
-    });
-    const remaining = votesPerCategory - used;
+    if (pip) pip.classList.toggle('filled', used > 0);
     if (counterText) {
-      counterText.textContent =
-        remaining === 0
-          ? 'No votes left'
-          : remaining === 1
-          ? '1 vote left'
-          : `${remaining} votes left`;
+      counterText.textContent = used > 0 ? 'Vote cast' : 'Not yet voted';
     }
-
+    const remaining = votesPerCategory - used;
     document.querySelectorAll('.vote-card').forEach(card => {
-      const selected = card.classList.contains('selected');
-      card.classList.toggle('disabled', remaining === 0 && !selected);
+      card.classList.toggle('disabled', remaining === 0 && !card.classList.contains('selected'));
     });
   }
 
-  grid.addEventListener('click', function (e) {
-    const card = e.target.closest('.vote-card');
-    if (!card || card.classList.contains('disabled')) return;
-
-    const beerId = card.dataset.beerId;
-    const currentlySelected = card.classList.contains('selected');
-
+  function doToggle(beerId, onSuccess) {
     fetch(`/vote/${categoryId}/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ beer_id: beerId }),
     })
       .then(r => r.json())
-      .then(data => {
-        if (data.error) {
-          if (data.error.toLowerCase().includes('no votes')) {
-            card.classList.add('disabled');
-          }
-          return;
-        }
-        card.classList.toggle('selected', data.voted);
-        updateCounter(data.votes_used);
-      })
+      .then(data => { if (!data.error) onSuccess(data); })
       .catch(() => {});
+  }
+
+  grid.addEventListener('click', function (e) {
+    const card = e.target.closest('.vote-card');
+    if (!card) return;
+
+    const isSelected = card.classList.contains('selected');
+    const isDisabled = card.classList.contains('disabled');
+
+    // Single-vote swap: clicking a different beer auto-moves the vote
+    if (!isSelected && !isDisabled && votesPerCategory === 1) {
+      const current = grid.querySelector('.vote-card.selected');
+      if (current) {
+        doToggle(current.dataset.beerId, () => {
+          current.classList.remove('selected');
+          doToggle(card.dataset.beerId, data => {
+            card.classList.add('selected');
+            updateCounter(data.votes_used);
+          });
+        });
+        return;
+      }
+    }
+
+    if (isDisabled) return;
+
+    doToggle(card.dataset.beerId, data => {
+      card.classList.toggle('selected', data.voted);
+      updateCounter(data.votes_used);
+    });
   });
 })();
 

@@ -19,6 +19,10 @@
     <div class="beer-card-info">
       <div class="beer-card-name">{{ beer.name }}</div>
       <div class="beer-card-guest">by {{ beer.guest_name }}</div>
+      {% if beer.category and beer.category in beer_category_map %}
+      {% set cat = beer_category_map[beer.category] %}
+      <div class="cat-badge">{{ cat[2] }} {{ cat[1] }}</div>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

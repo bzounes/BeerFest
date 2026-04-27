@@ -20,19 +20,28 @@ IMAGE_QUALITY = 82
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20 MB
 
-CATEGORIES = [
+# Categories beers are registered into (shown on registration form)
+BEER_CATEGORIES = [
     ('best_ipa',      'Best IPA',               '🍺'),
     ('best_dark',     'Best Dark Beer',          '🖤'),
     ('best_sour',     'Best Sour / Fruit Beer',  '🍋'),
     ('best_lager',    'Best Lager / Pilsner',    '🌾'),
     ('best_non_beer', 'Best Non-Beer',           '🍹'),
+]
+
+# Voting categories open to all registered beers regardless of type
+OPEN_CATEGORIES = {'most_unique', 'best_label', 'best_overall', 'worst_overall'}
+
+CATEGORIES = BEER_CATEGORIES + [
     ('most_unique',   'Most Unique',             '✨'),
     ('best_label',    'Best Label',              '🎨'),
     ('best_overall',  'Best Overall',            '🏆'),
     ('worst_overall', 'Worst Overall',           '💀'),
 ]
 
-VOTES_PER_CATEGORY = 3
+BEER_CATEGORY_MAP = {c[0]: c for c in BEER_CATEGORIES}
+
+VOTES_PER_CATEGORY = 1
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'beerfest')
 
 
@@ -55,6 +64,7 @@ def init_db():
             name        TEXT NOT NULL,
             guest_name  TEXT NOT NULL,
             image_path  TEXT,
+            category    TEXT,
             created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
@@ -75,6 +85,12 @@ def init_db():
 
         INSERT OR IGNORE INTO settings (key, value) VALUES ('results_revealed', 'false');
     ''')
+    # Migrate existing databases that predate the category column
+    try:
+        conn.execute('ALTER TABLE beers ADD COLUMN category TEXT')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     conn.commit()
     conn.close()
 
@@ -149,9 +165,14 @@ def register():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         guest_name = request.form.get('guest_name', '').strip()
+        category = request.form.get('category', '').strip()
 
         if not name or not guest_name:
             flash('Both beer name and your name are required.', 'error')
+            return redirect(url_for('register'))
+
+        if category not in BEER_CATEGORY_MAP:
+            flash('Please select a valid category for your beer.', 'error')
             return redirect(url_for('register'))
 
         image_path = None
@@ -164,8 +185,8 @@ def register():
 
         conn = get_db()
         conn.execute(
-            'INSERT INTO beers (name, guest_name, image_path) VALUES (?, ?, ?)',
-            (name, guest_name, image_path)
+            'INSERT INTO beers (name, guest_name, image_path, category) VALUES (?, ?, ?, ?)',
+            (name, guest_name, image_path, category)
         )
         conn.commit()
         conn.close()
@@ -173,7 +194,7 @@ def register():
         flash(f'"{name}" has been added to the festival! Cheers! 🍺', 'success')
         return redirect(url_for('beers'))
 
-    return render_template('register.html')
+    return render_template('register.html', beer_categories=BEER_CATEGORIES)
 
 
 @app.route('/beers')
@@ -181,7 +202,7 @@ def beers():
     conn = get_db()
     all_beers = conn.execute('SELECT * FROM beers ORDER BY created_at DESC').fetchall()
     conn.close()
-    return render_template('beers.html', beers=all_beers)
+    return render_template('beers.html', beers=all_beers, beer_category_map=BEER_CATEGORY_MAP)
 
 
 @app.route('/vote')
@@ -209,7 +230,12 @@ def vote(category_id):
 
     voter_id = session['voter_id']
     conn = get_db()
-    all_beers = conn.execute('SELECT * FROM beers ORDER BY name').fetchall()
+    if category_id in OPEN_CATEGORIES:
+        all_beers = conn.execute('SELECT * FROM beers ORDER BY name').fetchall()
+    else:
+        all_beers = conn.execute(
+            'SELECT * FROM beers WHERE category=? ORDER BY name', (category_id,)
+        ).fetchall()
     voted_ids = {
         row['beer_id'] for row in conn.execute(
             'SELECT beer_id FROM votes WHERE category=? AND voter_id=?',
@@ -225,6 +251,7 @@ def vote(category_id):
                            voted_ids=voted_ids,
                            votes_used=votes_used,
                            votes_per_category=VOTES_PER_CATEGORY,
+                           is_open=category_id in OPEN_CATEGORIES,
                            categories=CATEGORIES)
 
 
@@ -352,6 +379,7 @@ def admin():
     conn.close()
 
     return render_template('admin.html',
+                           beer_category_map=BEER_CATEGORY_MAP,
                            revealed=revealed,
                            beer_count=beer_count,
                            vote_count=vote_count,

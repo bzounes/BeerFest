@@ -192,6 +192,18 @@ img { max-width: 100%; display: block; }
   word-break: break-word;
 }
 .beer-card-guest { font-size: .78rem; color: var(--muted); }
+.cat-badge {
+  display: inline-block;
+  margin-top: .3rem;
+  font-size: .7rem;
+  font-weight: 700;
+  background: var(--bg-elevated);
+  color: var(--amber);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .1rem .5rem;
+  white-space: nowrap;
+}
 
 /* ── Vote card (selectable beer card) ───────────────────────────────────── */
 .vote-beer-grid {

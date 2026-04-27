@@ -4,22 +4,23 @@
 {% block content %}
 <div class="page-header">
   <h1 class="page-title">{{ category[2] }} {{ category[1] }}</h1>
-  <p class="page-subtitle">Choose up to {{ votes_per_category }} beers. Tap again to remove a vote.</p>
+  <p class="page-subtitle">
+    {% if is_open %}
+      Open category — all registered beers are eligible. Cast your 1 vote.
+    {% else %}
+      Only beers entered in this category are shown. Cast your 1 vote.
+    {% endif %}
+  </p>
 </div>
 
 <!-- Vote counter -->
 <div class="vote-counter">
-  <span class="vote-counter-label">Your votes:</span>
+  <span class="vote-counter-label">Your vote:</span>
   <div class="vote-counter-pips">
-    {% for i in range(votes_per_category) %}
-    <div class="pip {% if i < votes_used %}filled{% endif %}"></div>
-    {% endfor %}
+    <div class="pip {% if votes_used > 0 %}filled{% endif %}"></div>
   </div>
   <span class="vote-counter-text" id="votes-counter-text">
-    {% set remaining = votes_per_category - votes_used %}
-    {% if remaining == 0 %}No votes left
-    {% elif remaining == 1 %}1 vote left
-    {% else %}{{ remaining }} votes left{% endif %}
+    {% if votes_used > 0 %}Vote cast{% else %}Not yet voted{% endif %}
   </span>
 </div>
 
@@ -27,10 +28,10 @@
 <div class="vote-beer-grid" id="vote-grid"
      data-category="{{ category[0] }}"
      data-votes-per-category="{{ votes_per_category }}">
-  {% set remaining = votes_per_category - votes_used %}
   {% for beer in beers %}
   {% set is_voted = beer.id in voted_ids %}
-  <div class="vote-card {% if is_voted %}selected{% elif remaining == 0 %}disabled{% endif %}"
+  {% set is_disabled = (votes_used >= votes_per_category) and not is_voted %}
+  <div class="vote-card {% if is_voted %}selected{% elif is_disabled %}disabled{% endif %}"
        data-beer-id="{{ beer.id }}">
 
     <div class="vote-card-check">✓</div>
@@ -53,7 +54,11 @@
 {% else %}
 <div class="empty-state">
   <div class="empty-emoji">🍺</div>
-  <p>No beers have been registered yet. <a href="{{ url_for('register') }}">Add one!</a></p>
+  {% if is_open %}
+    <p>No beers have been registered yet. <a href="{{ url_for('register') }}">Add one!</a></p>
+  {% else %}
+    <p>No beers have been entered in this category yet. <a href="{{ url_for('register') }}">Add one!</a></p>
+  {% endif %}
 </div>
 {% endif %}
 
