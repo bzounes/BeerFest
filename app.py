@@ -7,7 +7,7 @@ from flask import (
     url_for, session, jsonify, flash
 )
 from werkzeug.utils import secure_filename
-from PIL import Image
+from PIL import Image, ImageOps
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'beerfest-secret-key-change-me')
@@ -110,6 +110,7 @@ def save_image(file_obj, original_filename):
     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     img = Image.open(file_obj)
+    img = ImageOps.exif_transpose(img)  # honour EXIF rotation before anything else
     img = img.convert('RGB') if img.mode in ('RGBA', 'P') else img
     img.thumbnail((MAX_IMAGE_DIM, MAX_IMAGE_DIM), Image.LANCZOS)
     img.save(path, quality=IMAGE_QUALITY, optimize=True)
