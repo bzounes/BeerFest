@@ -20,6 +20,14 @@
 
 <!-- Reveal / hide controls -->
 <div class="admin-section">
+  <div class="admin-section-title">Guest Instructions</div>
+  <p class="text-muted mb-2" style="font-size:.88rem;">
+    Open this page and use your browser's Print function to hand out to guests.
+  </p>
+  <a href="{{ url_for('instructions') }}" target="_blank" class="btn btn-muted btn-sm mb-2">🖨️ Print Instructions</a>
+</div>
+
+<div class="admin-section">
   <div class="admin-section-title">Results Visibility</div>
   {% if not revealed %}
   <p class="text-muted mb-2" style="font-size:.88rem;">

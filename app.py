@@ -1,5 +1,6 @@
 import os
 import uuid
+import socket
 import sqlite3
 from functools import wraps
 from flask import (
@@ -337,6 +338,34 @@ def results():
         }
     conn.close()
     return render_template('results.html', results=all_results, categories=CATEGORIES)
+
+
+# ---------------------------------------------------------------------------
+# Instructions (printable)
+# ---------------------------------------------------------------------------
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('10.254.254.254', 1))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '< your Pi\'s IP address >'
+
+
+@app.route('/instructions')
+def instructions():
+    port = request.host.split(':')[1] if ':' in request.host else '5000'
+    local_ip = get_local_ip()
+    url = f'http://{local_ip}:{port}'
+    return render_template('instructions.html',
+                           url=url,
+                           categories=CATEGORIES,
+                           beer_categories=BEER_CATEGORIES,
+                           open_categories=OPEN_CATEGORIES,
+                           votes_per_category=VOTES_PER_CATEGORY)
 
 
 # ---------------------------------------------------------------------------
