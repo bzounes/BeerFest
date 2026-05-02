@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>{% block title %}BeerFest{% endblock %} 🍺</title>
+  <title>{% block title %}BUZBeerFest{% endblock %} 🍺</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -14,8 +14,8 @@
 <nav class="navbar">
   <div class="navbar-inner">
     <a class="navbar-brand" href="{{ url_for('index') }}">
-      <img class="navbar-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="BeerFest logo">
-      <span>Beer</span>Fest
+      <img class="navbar-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="BUZBeerFest logo">
+      <span>BUZ</span>BeerFest
     </a>
     <div class="nav-links">
       <a class="nav-link {% if request.endpoint == 'register' %}active{% endif %}"
@@ -26,6 +26,8 @@
          href="{{ url_for('vote_home') }}">🗳️ Vote</a>
       <a class="nav-link {% if request.endpoint in ('results','results_hidden') %}active{% endif %}"
          href="{{ url_for('results') }}">🏆 Results</a>
+      <a class="nav-link {% if request.endpoint == 'instructions' %}active{% endif %}"
+         href="{{ url_for('instructions') }}">📋 Guide</a>
     </div>
   </div>
 </nav>
@@ -46,7 +48,7 @@
 
 <footer>
   <img class="footer-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="">
-  BeerFest &mdash; raise a glass responsibly
+  BUZBeerFest &mdash; Keep on Buzzing
 </footer>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
