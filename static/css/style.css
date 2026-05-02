@@ -39,6 +39,13 @@ a:hover { color: var(--gold); }
 
 img { max-width: 100%; display: block; }
 
+/* ── Logo filter (black-on-white PNG → amber on dark bg) ────────────────── */
+/*    invert: black lines → white, white bg → black (blends with dark theme) */
+/*    sepia + saturate + hue-rotate: white → warm amber                      */
+.logo-amber {
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(5deg) brightness(1.05);
+}
+
 /* ── Navbar ──────────────────────────────────────────────────────────────── */
 .navbar {
   background: var(--bg-card);
@@ -65,8 +72,18 @@ img { max-width: 100%; display: block; }
   letter-spacing: -.5px;
   flex: 1;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
 }
 .navbar-brand span { color: var(--gold); }
+
+.navbar-logo {
+  height: 30px;
+  width: auto;
+  display: block;
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(5deg) brightness(1.05);
+}
 
 .nav-links {
   display: flex;
@@ -390,7 +407,13 @@ img { max-width: 100%; display: block; }
   text-align: center;
   padding: 2.5rem 1rem 2rem;
 }
-.hero-emoji { font-size: 4rem; margin-bottom: .5rem; }
+.hero-logo {
+  height: 130px;
+  width: auto;
+  margin: 0 auto .75rem;
+  display: block;
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(5deg) brightness(1.05);
+}
 .hero-title {
   font-size: clamp(1.8rem, 6vw, 2.8rem);
   font-weight: 900;
@@ -640,6 +663,16 @@ footer {
   color: var(--dim);
   font-size: .78rem;
   border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+}
+.footer-logo {
+  height: 18px;
+  width: auto;
+  opacity: .4;
+  filter: invert(1);
 }
 
 /* ── Responsive tweaks ───────────────────────────────────────────────────── */

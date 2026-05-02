@@ -6,13 +6,17 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>{% block title %}BeerFest{% endblock %} 🍺</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
 <nav class="navbar">
   <div class="navbar-inner">
-    <a class="navbar-brand" href="{{ url_for('index') }}">🍺 <span>Beer</span>Fest</a>
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <img class="navbar-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="BeerFest logo">
+      <span>Beer</span>Fest
+    </a>
     <div class="nav-links">
       <a class="nav-link {% if request.endpoint == 'register' %}active{% endif %}"
          href="{{ url_for('register') }}">➕ Add Beer</a>
@@ -41,7 +45,8 @@
 </main>
 
 <footer>
-  BeerFest &mdash; raise a glass responsibly 🍺
+  <img class="footer-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+  BeerFest &mdash; raise a glass responsibly
 </footer>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
